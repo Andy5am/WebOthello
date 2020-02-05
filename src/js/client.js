@@ -22,24 +22,61 @@ miObjeto.w.push(4);
 console.log(miOtroObjeto);
 
 const {x, y} = miObjeto;*/
-/*
-const contenedorSemaforo = document.createElement('div');
 
-contenedorSemaforo.style.height = '100px';
-contenedorSemaforo.style.backgroundColor = 'red';
-contenedorSemaforo.onclick = () => {
-	alert("si puedo!")
-};
-
-
-root.appendChild(contenedorSemaforo);*/
+import lastIndexOf from 'lodash/lastIndexOf'
+import indexOf from 'lodash/indexOf'
+import drop from 'lodash/drop'
+import dropRight from 'lodash/dropRight'
+import isEmpty from 'lodash/isEmpty'
 
 
 const root = document.getElementById('root');
-//console.log(root, typeof(root));
 
-const verificarH = (lista, index) => {
+const sumar = (a = 0, b) => a + b;
 
+const verificarHor = (lista, indexF, indexC, state) => {
+	const length = lista.length;
+	const valor = state.turnoJugador1? 1:-1;
+	let indexIz = lastIndexOf(lista,valor,indexC);
+	let indexDer = indexOf(lista,valor,indexC);
+
+	if(indexIz < 1){
+		indexIz = indexC;
+	}
+	lista = drop(lista, indexIz + 1);
+
+	if(indexDer < 1){
+		indexDer = indexC;
+	}
+	lista = dropRight(lista, length - indexDer);
+	
+	if (!isEmpty(lista)) {
+		if (valor > 0) {
+			if (lista.reduce(sumar) === (indexIz - indexDer + 1)) {
+				state.board[indexF][indexC] = 1;
+				state.board[indexF].map((fila, col) => {
+					if (col > indexIz && col < indexDer) {
+						state.board[indexF][col] = 1;
+					}
+				})
+				return true;
+			}else{
+				return false;
+			}
+		}else{
+			if (lista.reduce(sumar) === (indexDer - indexIz - 1)) {
+				state.board[indexF][indexC] = -1;
+				state.board[indexF].map((fila, col) => {
+					if (col > indexIz && col < indexDer) {
+						state.board[indexF][col] = -1;
+					}
+				})
+				return true;
+			}else{
+				return false;
+			}
+		}
+	}	
 }
 
 const renderFicha = ({fila, columna,valor, state}) => {
@@ -64,14 +101,20 @@ const renderFicha = ({fila, columna,valor, state}) => {
 
 
 
+		if (valor === 0) {
 
-
-		state.board[fila][columna] = state.turnoJugador1?1:-1;
-
-
-		state.turnoJugador1 = !state.turnoJugador1;
-		root.innerHTML = "";
-		render(root,state);
+			//state.board[fila][columna] = state.turnoJugador1?1:-1;
+			//console.log('verificado')
+			//console.log(verificarHor(state.board[fila],fila, columna, state));
+			const verificado = verificarHor(state.board[fila],fila, columna, state)
+			if (verificado) {
+				state.turnoJugador1 = !state.turnoJugador1;
+				// console.log("turno")
+				// console.log(state.turnoJugador1)
+			}
+			root.innerHTML = '';
+			render(root,state);
+		}
 	}
 
 	return ficha;
