@@ -1,28 +1,8 @@
-/*const sumar = (a, b) => a + b;
+// Andy Castillo 18040
+// Ejercicio Othello
+// 9.02.2020
 
-const enteros = [1, 2, 3, 4, 5];
-
-console.log(enteros.map(i => i * i));
-
-console.log(enteros.reduce(sumar, 0));
-
-const miObjeto = {
-  x: 0,
-  y: 100,
-  w:  [1,2,3],
-};
-
-const miOtroObjeto = {
-  ...miObjeto,
-  z: -2,
-};
-
-miObjeto.w.push(4);
-
-console.log(miOtroObjeto);
-
-const {x, y} = miObjeto;*/
-
+//Se importaron funcones de lodash y mathjs
 import lastIndexOf from 'lodash/lastIndexOf'
 import indexOf from 'lodash/indexOf'
 import drop from 'lodash/drop'
@@ -33,100 +13,32 @@ import unzip from 'lodash/unzip'
 import flattenDeep from 'lodash/flattenDeep'
 import { transpose } from 'mathjs'
 
-
+//se llama al dom
 const root = document.getElementById('root');
 
+//funcion para sumar dos numeros
 const sumar = (a = 0, b) => a + b;
 
-// const verificarVer = (lista, indexF, indexC, state) => {
-// 	console.log("hola")
-// 	console.log(state.board)
-// 	const length = lista.length;
-// 	const valor = state.turnoJugador1? 1:-1;
-// 	console.log(lista);
-// 	let indexIz = lastIndexOf(lista,valor,indexC);
-// 	let indexDer = indexOf(lista,valor,indexC);
-// 	console.log(indexIz, indexDer);
-// 	if(indexIz < 1){
-// 		indexIz = indexC;
-// 	}
-// 	lista = drop(lista, indexIz + 1);
-// 	console.log(lista)
-// 	if(indexDer < 1){
-// 		indexDer = indexC;
-// 	}
-// 	lista = dropRight(lista, length - indexDer);
-// 	console.log(lista)
-// 	if (!isEmpty(lista)) {
-// 		if (valor > 0) {
-// 			if (lista.reduce(sumar) === (indexIz - indexDer + 1)) {
-// 				state.board = transpose(state.board);
-// 				const verificadoV = verificarVer(state.board[indexC],indexC, indexF,state);
-// 				state.board = transpose(state.board);
-// 				state.board[indexF][indexC] = 1;
-// 				state.board[indexF].map((fila, col) => {
-// 					if (col > indexIz && col < indexDer) {
-// 						state.board[indexF][col] = 1;
-// 					}
-// 				})
-// 				return true;
-// 			}else{
-// 				state.board = transpose(state.board);
-// 				if(verificarVer(state.board[indexC],indexC, indexF,state)){
-// 					state.board = transpose(state.board);
-// 					return true
-// 				}else{
-// 					state.board = transpose(state.board);
-// 					return false;
-// 				}
-// 			}
-// 		}else{
-// 			if (lista.reduce(sumar) === (indexDer - indexIz - 1)) {
-// 				state.board = transpose(state.board);
-// 				const verificadoV = verificarVer(state.board[indexC],indexC, indexF,state);
-// 				state.board = transpose(state.board);
-// 				state.board[indexF][indexC] = -1;
-// 				state.board[indexF].map((fila, col) => {
-// 					if (col > indexIz && col < indexDer) {
-// 						state.board[indexF][col] = -1;
-// 					}
-// 				})
-// 				return true;
-// 			}else{
-// 				state.board = transpose(state.board);
-// 				if(verificarVer(state.board[columna],columna, fila,state)){
-// 					state.board = transpose(state.board);
-// 					return true;
-// 				}else{
-// 					state.board = transpose(state.board);
-// 					return false;
-// 				}
-// 			}
-// 		}
-// 	}else{
-// 		return false;
-// 	}	
-// }
-
+//Funcion para verificar si se puede hacer un movimiento horizontal o vertical
 const verificarHor = (lista, indexF, indexC, state) => {
 	const length = lista.length;
-	// console.log(lista)
 	const valor = state.turnoJugador1? 1:-1;
+//Consigue el ulitmo y primer index del elemento de su mismo color en la fila
 	let indexIz = lastIndexOf(lista,valor,indexC);
 	let indexDer = indexOf(lista,valor,indexC);
-	// console.log(indexIz, indexDer)
 	state.board[indexF][indexC] = state.turnoJugador1? -1:1;
+//Comprueba que si hay para izquierda y derecha sino es el index que se apacho
 	if(indexIz < 0 || indexIz === indexC -1){
 		indexIz = indexC;
 	}
+	//Se hace mas pequeña la lista para solo dejar los elemento a cambiar de color
 	lista = drop(lista, indexIz + 1);
-	//console.log(lista)
 	if(indexDer < 0 || indexDer === indexC +1){
 		indexDer = indexC;
 	}
 	lista = dropRight(lista, length - indexDer);
-	// console.log(lista)
-	// console.log(indexIz, indexDer)
+//Si la lista modificada no esta vacia
+//Se verifica que solo hayan elementos del otro color
 	if (!isEmpty(lista)) {
 		if (valor > 0) {
 			//state.board[indexF][indexC] = 1;
@@ -167,64 +79,47 @@ const verificarHor = (lista, indexF, indexC, state) => {
 	}	
 }
 
+//Funcion para verificar si se puede hacer movimiento Diagonal Arriba Izquierda
 const verificarDiaArI = (indexF, indexC, state, continuar = false) => {
-	//console.log("Entre")
 	const valor = state.turnoJugador1? 1:-1;
 	const notValor = state.turnoJugador1? -1:1;
-	// console.log(valor, notValor);
-	// console.log(continuar);
-	// console.log(indexF, indexC)
-	// console.log(state.board[indexF-1][indexC+1])
 	let resultado = false;
+	//Se verifica que no sea en la orilla donde ya no hay espacios
 	if(indexF === 0 || indexC === 0){
 		return resultado;
 	}
+	//Si la siguinte pieza es del otro color se vuelve a llamar la funcion
 	if (state.board[indexF-1][indexC-1]===notValor) {
-//		console.log("soy igual")
 		continuar = true;
 		resultado = verificarDiaArI(indexF-1,indexC-1,state,continuar);
 	}else if (state.board[indexF-1][indexC-1] === valor){
+//Si la siguiente pieza es del mismo color se ve si ya se habia encontrado una de otro antes
 		resultado = continuar ;
-		// if (continuar) {
-		// 	resultado = true;
-		// 	console.log("funciono");
-		// }else {
-		// 	console.log("termine soy igual");
-		// 	resultado = false;
-		// }
 	}
-	// else if (state.board[indexF-1][indexC+1] === 0){
-	// 	resultado = false;
-	// 	console.log("termine no hay");
-	// }
-//	console.log("regreso",resultado)
 	return resultado;
 }
 
+//Funcion para ver movimiento Diagonla Arriba Derecha
+//Igual que la anterior solo cambia donde se evalua
 const verificarDiaArD = (indexF, indexC, state, continuar = false) =>{
-	//console.log("ARRDer")
 	const valor = state.turnoJugador1? 1:-1;
 	const notValor = state.turnoJugador1? -1:1;
 	let resultado = false;
-	//console.log(valor, notValor)
-	//console.log(indexF,indexC)
 	if(indexF === 0 || indexC === 7){
 		return resultado;
 	}
 	if (state.board[indexF-1][indexC+1] === notValor){
-		//console.log("soy identico")
 		continuar = true;
 		resultado = verificarDiaArD(indexF-1,indexC+1,state,continuar);
 	}
 	if (state.board[indexF-1][indexC+1] === valor){
-		//console.log("hola")
 		resultado = continuar;
-		//console.log(resultado);
 	}
-	//console.log("result",resultado)
 	return resultado;
 }
 
+//Funcion para cambiar la piezas de color en Diagonal Arriba Izquierda
+//Hace lo mismo que la anterior solo que si la siquiente es de otro color cambia su valor
 const cambiarDiaArI = (indexF, indexC, state, continuar= false) => {
 	const valor = state.turnoJugador1 ? 1:-1;
 	const notValor = state.turnoJugador1 ? -1:1;
@@ -243,6 +138,8 @@ const cambiarDiaArI = (indexF, indexC, state, continuar= false) => {
 	}
 }
 
+//Funcion para cambiar la piezas de color en Diagonal Arriba Derecha
+//Hace lo mismo que la anterior solo que si la siquiente es de otro color cambia su valor
 const cambiarDiaArD = (indexF, indexC, state, continuar=false) => {
 	const valor = state.turnoJugador1 ? 1:-1;
 	const notValor = state.turnoJugador1 ? -1:1;
@@ -261,30 +158,27 @@ const cambiarDiaArD = (indexF, indexC, state, continuar=false) => {
 	}
 }
 
+//Funcion para ver movimiento Diagonla Abajo Derecha
+//Igual que la anterior solo cambia donde se evalua
 const verificarDiaAbD = (indexF, indexC, state, continuar = false) =>{
-	//console.log("ARRDer")
 	const valor = state.turnoJugador1? 1:-1;
 	const notValor = state.turnoJugador1? -1:1;
 	let resultado = false;
-	//console.log(valor, notValor)
-	//console.log(indexF,indexC)
 	if(indexF === 7 || indexC === 7){
 		return resultado;
 	}
 	if (state.board[indexF+1][indexC+1] === notValor){
-		//console.log("soy identico")
 		continuar = true;
 		resultado = verificarDiaAbD(indexF+1,indexC+1,state,continuar);
 	}
 	if (state.board[indexF+1][indexC+1] === valor){
-		//console.log("hola")
 		resultado = continuar;
-		//console.log(resultado);
 	}
-	//console.log("result",resultado)
 	return resultado;
 }
 
+//Funcion para cambiar la piezas de color en Diagonal Abajo Derecha
+//Hace lo mismo que la anterior solo que si la siquiente es de otro color cambia su valor
 const cambiarDiaAbD = (indexF, indexC, state, continuar=false) => {
 	const valor = state.turnoJugador1 ? 1:-1;
 	const notValor = state.turnoJugador1 ? -1:1;
@@ -303,30 +197,27 @@ const cambiarDiaAbD = (indexF, indexC, state, continuar=false) => {
 	}
 }
 
+//Funcion para ver movimiento Diagonla Abajo Izquierda
+//Igual que la anterior solo cambia donde se evalua
 const verificarDiaAbI = (indexF, indexC, state, continuar = false) =>{
-	//console.log("ARRDer")
 	const valor = state.turnoJugador1? 1:-1;
 	const notValor = state.turnoJugador1? -1:1;
 	let resultado = false;
-	//console.log(valor, notValor)
-	//console.log(indexF,indexC)
 	if(indexF === 7 || indexC === 0){
 		return resultado;
 	}
 	if (state.board[indexF+1][indexC-1] === notValor){
-		//console.log("soy identico")
 		continuar = true;
 		resultado = verificarDiaAbI(indexF+1,indexC-1,state,continuar);
 	}
 	if (state.board[indexF+1][indexC-1] === valor){
-		//console.log("hola")
 		resultado = continuar;
-		//console.log(resultado);
 	}
-	//console.log("result",resultado)
 	return resultado;
 }
 
+//Funcion para cambiar la piezas de color en Diagonal Abajo Izquierda
+//Hace lo mismo que la anterior solo que si la siquiente es de otro color cambia su valor
 const cambiarDiaAbI = (indexF, indexC, state, continuar=false) => {
 	const valor = state.turnoJugador1 ? 1:-1;
 	const notValor = state.turnoJugador1 ? -1:1;
@@ -345,7 +236,9 @@ const cambiarDiaAbI = (indexF, indexC, state, continuar=false) => {
 	}
 }
 
+//Funcion para ver quien va ganando
 const verGanador = (state) => {
+	//Se convierte la matriz en una sola lista y se suman todos sus valores
 	const tablero = flattenDeep(state.board);
 	const suma = tablero.reduce(sumar);
 	if (suma < 0) {
@@ -357,9 +250,10 @@ const verGanador = (state) => {
 	}
 }
 
+//Funcion para renderizar las fichas
 const renderFicha = ({fila, columna,valor, state}) => {
 	const ficha = document.createElement('div');
-
+//El estilo de cada ficha
 	ficha.style.height = '25px';
 	ficha.style.width = '25px';
 	ficha.style.padding = '10px';
@@ -373,7 +267,10 @@ const renderFicha = ({fila, columna,valor, state}) => {
 	}else{
 		ficha.style.backgroundColor = 'grey';
 	}
-
+//Funcion onclick de las fichas 
+//Al apachar se verifica si se puede poner en cada direccion
+//En los que se puede se cambia de color
+//Y si se pudo en alguno cambia de turno y aparece quien va ganando
 	ficha.onclick = () => {
 
 
@@ -425,14 +322,15 @@ const renderFicha = ({fila, columna,valor, state}) => {
 	return ficha;
 };
 
+//Funcion que renderiza el tablero
 const render = (root, state) => {
-
+//Estilo del tablero
 	const tablero = document.createElement('div');
 	tablero.style.backgroundColor = 'DarkGreen';
 	tablero.style.height = '520px';
 	tablero.style.width = '520px';
 	tablero.style.padding = '20px';
-
+//Creacion de la fichas dentro del tablero
 	state.board.map(
 		(filas, fila) => {
 		filas.map((valor, columna) => renderFicha({fila, columna,valor, state})).forEach(
@@ -440,7 +338,7 @@ const render = (root, state) => {
 	},)
 	root.appendChild(tablero);
 }
-
+//El estado del juego el cual va cambiando
 const state = {
 	turnoJugador1 : true,
 	board: [[0,0,0,0,0,0,0,0],
@@ -452,5 +350,6 @@ const state = {
 			[0,0,0,0,0,0,0,0],
 			[0,0,0,0,0,0,0,0]],
 		};
+//Se llama al render para jugar
 render(root, state);
 console.log("Es turno del Jugador 1: negro");
